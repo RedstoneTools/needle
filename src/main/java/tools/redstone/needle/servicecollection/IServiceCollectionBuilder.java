@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public interface IServiceCollectionBuilder {
+    // TODO: Add constraints
     <TServiceInterface, TServiceImplementation> IServiceCollectionBuilder addService(Class<TServiceInterface> serviceInterfaceClass, Class<TServiceImplementation> serviceImplementationClass, ServiceLifetime serviceLifetime);
     <TServiceInterface> IServiceCollectionBuilder addService(Class<TServiceInterface> serviceInterfaceClass, Function<IServiceCollection, Optional<TServiceInterface>> serviceSupplier, ServiceLifetime serviceLifetime);
     IServiceCollection build();
