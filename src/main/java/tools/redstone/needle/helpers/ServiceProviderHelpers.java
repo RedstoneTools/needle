@@ -26,11 +26,9 @@ public final class ServiceProviderHelpers {
                 throw new RuntimeException("Cannot set accessibility of " + ReflectionHelpers.referenceField(fieldToInject), e);
             }
 
-            var inject = fieldToInject.getAnnotation(Inject.class);
-            var valueToInject = serviceCollection.getService(getTypeToInject(fieldToInject, inject));
-
+            var valueToInject = serviceCollection.getService(getTypeToInject(fieldToInject));
             try {
-                if (inject.optional()) {
+                if (isOptional(fieldToInject)) {
                     fieldToInject.set(service, valueToInject);
                 } else {
                     if (valueToInject.isEmpty()) {
@@ -47,15 +45,16 @@ public final class ServiceProviderHelpers {
         return Optional.of(service);
     }
 
-    private static Class<?> getTypeToInject(Field fieldToInject, Inject inject) {
-        var fieldType = fieldToInject.getType();
-        if (!inject.optional()) {
-            return fieldType;
+    private static Class<?> getTypeToInject(Field fieldToInject) {
+        if (!isOptional(fieldToInject)) {
+            return fieldToInject.getType();
         }
 
-        assert fieldType == Optional.class;  // TODO: Use an annotation preprocessor to assert this at compile time
-
         return (Class<?>) ((ParameterizedType) fieldToInject.getGenericType()).getActualTypeArguments()[0];  // TODO: Put this in reflection helpers
+    }
+
+    private static boolean isOptional(Field field) {
+        return field.getType() == Optional.class;
     }
 
     private static <TService> TService createService(Class<TService> serviceClass) {
